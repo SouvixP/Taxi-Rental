@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from . models import Contact
+from . models import Contact, Order
 from django.urls import reverse
 from taxi.helper import get_user
 from taxi.auth_helper import get_sign_in_url, get_token_from_code, store_token, store_user, remove_user_and_token, get_token
@@ -25,6 +25,25 @@ def contact(request):
         contact.save()
         thank = True
     return render(request, 'taxi/contact.html', {'thank': thank})
+
+def checkout(request):
+    if request.method == 'POST':
+       email = request.POST.get("Email")
+       phone_no = request.POST.get("Phone Number")
+       destination = request.POST.get("destination")
+       car_type = request.POST.get("car_type")
+       order = Order(email=email, phone_no=phone_no, destination=destination, car_type=car_type)
+       order.save()
+    #    print('Order is done.')
+       amount=order.tot_price()
+       request.session['amount']=amount
+       return HttpResponseRedirect(reverse('payment'))
+    else:
+        return render(request, 'taxi/checkout.html')
+
+def payment(request):
+    amount=request.session['amount']
+    return render(request, 'taxi/amount.html', {'amount':amount})
 
 def sign_in(request):
   # Get the sign-in URL

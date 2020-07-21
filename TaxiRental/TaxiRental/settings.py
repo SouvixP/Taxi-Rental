@@ -10,6 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'adriraj.alcheringa@gmail.com'
+EMAIL_HOST_PASSWORD = 'Diablo_7'
+
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)

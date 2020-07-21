@@ -4,7 +4,11 @@ from . models import Contact, Order
 from django.urls import reverse
 from taxi.helper import get_user
 from taxi.auth_helper import get_sign_in_url, get_token_from_code, store_token, store_user, remove_user_and_token, get_token
+from django.conf import settings
+from django.core.mail import send_mail
+import random
 
+EMAIL_HOST_USER='adriraj.alcheringa@gmail.com'
 
 def index(request):
     return render(request,'taxi/index.html')
@@ -37,13 +41,31 @@ def checkout(request):
     #    print('Order is done.')
        amount=order.tot_price()
        request.session['amount']=amount
+       request.session['destination'] = destination
+       request.session['car_type'] = car_type
+       request.session['email']=email
        return HttpResponseRedirect(reverse('payment'))
     else:
         return render(request, 'taxi/checkout.html')
 
 def payment(request):
     amount=request.session['amount']
-    return render(request, 'taxi/amount.html', {'amount':amount})
+    destination = request.session['destination']
+    car_type = request.session['car_type']
+    email = request.session['email']
+    otp_sent = False
+    
+    if request.method == 'POST':
+        to_list=[email, EMAIL_HOST_USER]
+        otp = random.randrange(1000,9999)
+        message='Your OTP for the ride is '+ str(otp)
+        from_email=EMAIL_HOST_USER
+        subject='OTP for ride'
+        send_mail(subject,message,from_email,to_list,fail_silently=False)
+        otp_sent=True
+        return render(request, 'taxi/amount.html', {'otp_sent':otp_sent,'amount': amount,'destination':destination,'car_type':car_type})
+    
+    return render(request, 'taxi/amount.html', {'otp_sent':otp_sent,'amount': amount,'destination':destination,'car_type':car_type})
 
 def sign_in(request):
   # Get the sign-in URL

@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import User
 # from phonenumber_field.modelfields import PhoneNumberField
 
 Destination_choices = ( 
@@ -64,4 +65,11 @@ class Order(models.Model):
         dist = Distance[self.destination]
         rate = Rate_per_km[self.car_type]
         return dist*rate
+
+class Driver(models.Model):
+    user = models.OneToOneField(User, models.CASCADE, primary_key=True)
+    licence_no = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.user.username
 

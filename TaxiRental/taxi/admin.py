@@ -1,6 +1,7 @@
 from django.contrib import admin
-from . models import Contact, Order
+from . models import *
 
 # Register your models here.
 admin.site.register(Contact)
 admin.site.register(Order)
+admin.site.register(Driver)

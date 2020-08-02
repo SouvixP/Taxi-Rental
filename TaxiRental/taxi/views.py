@@ -1,12 +1,16 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
-from . models import Contact, Order
+from django.shortcuts import render,redirect
+from django.contrib.auth.models import User
+from django.contrib import messages
+from . models import *
 from django.urls import reverse
 from taxi.helper import get_user
 from taxi.auth_helper import get_sign_in_url, get_token_from_code, store_token, store_user, remove_user_and_token, get_token
 from django.conf import settings
 from django.core.mail import send_mail
 import random
+from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.decorators import login_required
 
 EMAIL_HOST_USER='adriraj.alcheringa@gmail.com'
 
@@ -89,3 +93,40 @@ def callback(request):
   store_user(request, user)
 
   return HttpResponseRedirect(reverse('taxi/'))
+
+def handle_signup(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        license_no = request.POST['license_no']
+        pass1 = request.POST['pass1']  
+        pass2 = request.POST['pass2']
+
+        user = User.objects.create_user(username=username, first_name=first_name,last_name=last_name,email=email,password=pass1)
+        user1 = Driver.objects.create(licence_no=license_no,user=user)
+        user1.save()
+        messages.success(request,"Your account has been successfully created")
+        return redirect('HomePage')
+
+    else:
+        return HttpResponse('404-Not Found')
+
+def handle_login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        pass1 = request.POST['pass']
+
+        user = authenticate(username=username, password=pass1)
+        if user:
+            login(request,user)
+        else:
+            messages.success(request, 'Invalid login details!!!')
+        return redirect('HomePage')
+    return HttpResponse('handle_login')
+
+@login_required
+def handle_logout(request):
+    logout(request)
+    return redirect('HomePage')

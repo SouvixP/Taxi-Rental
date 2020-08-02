@@ -10,4 +10,7 @@ urlpatterns = [
    path("callback", views.callback, name="callback"),
    path("checkout/",views.checkout, name="checkout"),
    path("payment/",views.payment, name="payment"),
+   path('handle_signup/',views.handle_signup, name='handle_signup'),
+   path('handle_login/',views.handle_login, name='handle_login'),
+   path('handle_logout/',views.handle_logout, name='handle_logout'),
 ]
